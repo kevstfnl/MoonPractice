@@ -1,0 +1,7 @@
+name: MoonCore
+version: 0.1
+author: SevenTime
+main: net.moon.practice.Practice
+load: STARTUP
+depend:
+  - MoonCore-Bukkit

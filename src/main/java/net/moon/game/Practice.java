@@ -1,4 +1,4 @@
-package net.moon.practice;
+package net.moon.game;
 
 import lombok.Getter;
 import net.mooncore.api.commons.generators.VoidGenerator;

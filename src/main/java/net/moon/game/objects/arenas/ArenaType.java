@@ -1,4 +1,4 @@
-package net.moon.practice.objects.arenas;
+package net.moon.game.objects.arenas;
 
 public enum ArenaType {
     CLASSIC,

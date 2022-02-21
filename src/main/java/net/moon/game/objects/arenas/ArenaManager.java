@@ -1,4 +1,4 @@
-package net.moon.practice.objects.arenas;
+package net.moon.game.objects.arenas;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +10,4 @@ public class ArenaManager {
     public ArenaManager() {
         this.arenas = new ArrayList<>();
     }
-
-
-
-
 }

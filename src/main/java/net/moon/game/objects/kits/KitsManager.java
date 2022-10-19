@@ -33,8 +33,10 @@ public class KitsManager {
         this.kits.clear();
     }
 
-    public void create(final String name) {
-        this.kits.put(name, new Kit(name));
+    public Kit create(final String name) {
+        final Kit kit = new Kit(name);
+        this.kits.put(name, kit);
+        return kit;
     }
 
     public void delete(final Kit kit) {

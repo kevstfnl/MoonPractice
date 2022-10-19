@@ -8,6 +8,9 @@ import net.moon.game.constants.PracticePermissions;
 import net.moon.game.objects.kits.Kit;
 import net.moon.game.objects.kits.KitsManager;
 import net.moon.game.utils.builders.ClickableBuilder;
+import net.moon.spigot.Moon;
+import net.moon.spigot.configurations.MoonConfig;
+import net.moon.spigot.knockback.KnockbackProfile;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -64,59 +67,21 @@ public class KitCommand implements CommandExecutor {
                 case 2 -> {
                     switch (args[0].toLowerCase()) {
                         case "create" -> {
-                            this.kitsManager.create(args[1]);
+                            final Kit kit = this.kitsManager.create(args[1]);
+                            sendEditMessage(player, kit);
+                            player.sendMessage("§aKit §e" + kit.getName() + " has been created.");
                         }
                         case "delete" -> {
                             final Kit kit = this.kitsManager.get(args[1]);
                             if (kit != null) {
                                 this.kitsManager.delete(kit);
+                                player.sendMessage("§aKit §e" + kit.getName() + " has been deleted.");
                             }
                         }
                         case "edit" -> {
                             final Kit kit = this.kitsManager.get(args[1]);
                             if (kit != null) {
-                                final BaseComponent displayName = new ClickableBuilder("  §eDisplay-Name: §7" + kit.getDisplayName())
-                                        .setHover("")
-                                        .setClick("/kit displayname " + kit.getName() + " ", ClickEvent.Action.SUGGEST_COMMAND)
-                                        .build();
-                                final BaseComponent editable = new ClickableBuilder("  §eEditable: §7" + kit.getDisplayName())
-                                        .setHover("")
-                                        .setClick("/kit editable " + kit.getName(), ClickEvent.Action.SUGGEST_COMMAND)
-                                        .build();
-                                final BaseComponent slot = new ClickableBuilder("  §eSlot: §7" + kit.getSlot())
-                                        .setHover("")
-                                        .setClick("/kit slot " + kit.getName() + " ", ClickEvent.Action.SUGGEST_COMMAND)
-                                        .build();
-                                final BaseComponent noDamageTick = new ClickableBuilder("  §eNo Damage Tick: §7" + kit.getNoDamageTicks())
-                                        .setHover("")
-                                        .setClick("/kit nodamagetick " + kit.getName() + " ", ClickEvent.Action.SUGGEST_COMMAND)
-                                        .build();
-                                final BaseComponent icon = new ClickableBuilder("§7§eIcon§7)")
-                                        .setHover("")
-                                        .setClick("/kit icon " + kit.getName(), ClickEvent.Action.RUN_COMMAND)
-                                        .build();
-                                final BaseComponent contents = new ClickableBuilder("§7§eContents§7)")
-                                        .setHover("")
-                                        .setClick("/kit contents " + kit.getName(), ClickEvent.Action.RUN_COMMAND)
-                                        .build();
-                                final BaseComponent effects = new ClickableBuilder("§7§eEffects§7)")
-                                        .setHover("")
-                                        .setClick("/kit effects " + kit.getName(), ClickEvent.Action.RUN_COMMAND)
-                                        .build();
-                                final BaseComponent save = new ClickableBuilder("§7§eSave§7)")
-                                        .setHover("")
-                                        .setClick("/kit save " + kit.getName(), ClickEvent.Action.RUN_COMMAND)
-                                        .build();
-
-                                player.spigot().sendMessage(this.separator);
-                                player.sendMessage(new TextComponent("§a§lKits §e§l" + kit.getName() + "§a§lEditor:"));
-                                player.spigot().sendMessage(displayName);
-                                player.spigot().sendMessage(editable);
-                                player.spigot().sendMessage(slot);
-                                player.spigot().sendMessage(noDamageTick);
-                                player.spigot().sendMessage(icon, contents, effects);
-                                player.spigot().sendMessage(save);
-                                player.spigot().sendMessage(this.separator);
+                                sendEditMessage(player, kit);
                             }
                         }
                     }
@@ -129,14 +94,23 @@ public class KitCommand implements CommandExecutor {
                                 final ItemStack item = player.getInventory().getItemInMainHand();
                                 if (item != null && !item.getType().equals(Material.AIR)) {
                                     kit.setIcon(item);
+                                    sendEditMessage(player, kit);
+                                    player.sendMessage("§aIcon of §e" + kit.getName() + " has been set.");
+                                } else {
+                                    player.sendMessage("§cYou must have an item in your main hand !");
                                 }
+
                             }
                             case "contents" -> {
                                 kit.setContents(player.getInventory().getContents());
                                 kit.setArmors(player.getInventory().getArmorContents());
+                                sendEditMessage(player, kit);
+                                player.sendMessage("§aKit contents has been set.");
                             }
                             case "effects" -> {
                                 kit.setEffects(player.getActivePotionEffects());
+                                sendEditMessage(player, kit);
+                                player.sendMessage("§aKit effects has been set.");
                             }
                         }
                     }
@@ -147,44 +121,87 @@ public class KitCommand implements CommandExecutor {
                         switch (args[0].toLowerCase()) {
                             case "displayname" -> {
                                 kit.setDisplayName(args[2]);
+                                sendEditMessage(player, kit);
+                                player.sendMessage("§aKit display name has been set.");
                             }
                             case "editable" -> {
                                 kit.setEditable(Boolean.parseBoolean(args[2]));
+                                sendEditMessage(player, kit);
+                                player.sendMessage(kit.isEditable() ? "§aThis kit is now editable." : "§aThis kit is now uneditable.");
                             }
                             case "slot" -> {
                                 kit.setSlot(Integer.parseInt(args[2]));
+                                sendEditMessage(player, kit);
+                                player.sendMessage("§aKit slot has been set.");
                             }
                             case "nodamagetick" -> {
                                 kit.setNoDamageTicks(Integer.parseInt(args[2]));
+                                sendEditMessage(player, kit);
+                                player.sendMessage("§aKit no damage tick has been set.");
+                            }
+                            case "knockback" -> {
+                                if (Practice.isUseMoon) {
+                                    final KnockbackProfile profile = Moon.get().getKnockbackConfig().getKbProfileByName(args[2]);
+                                    if (profile != null) {
+                                        kit.setKnockbackProfile(profile);
+                                        sendEditMessage(player, kit);
+                                        player.sendMessage("§aKit knockback has been set.");
+                                    } else  {
+                                        player.sendMessage("§cThis knockback profile doesn't exist !");
+                                    }
+                                }
                             }
                         }
                     }
                 }
 
             }
-
-            /*
-            §8» §8§m---------------------§8 «
-            §a§lKits editor:
-                (v) §eNoDebuff [X] [/]
-
-                    (Create) (Save-All)
-            §8» §8§m---------------------§8 «
-             */
-
-            /*
-            §8» §8§m---------------------§8 «
-            §a§lKit NoDebuff edition:
-                §eDisplay-Name: &6> §cNoDebuff
-                §eEditable: True
-                §eSlot: 0
-                §eNoDamageTick: 20
-              (Icon) (Contents) (Effects)
-                        <- (Save)
-            §8» §8§m---------------------§8 «
-             */
-
         }
         return false;
+    }
+
+    private void sendEditMessage(final Player player, final Kit kit) {
+        final BaseComponent displayName = new ClickableBuilder("  §eDisplay-Name: §7" + kit.getDisplayName())
+                .setHover("")
+                .setClick("/kit displayname " + kit.getName() + " ", ClickEvent.Action.SUGGEST_COMMAND)
+                .build();
+        final BaseComponent editable = new ClickableBuilder("  §eEditable: §7" + kit.getDisplayName())
+                .setHover("")
+                .setClick("/kit editable " + kit.getName(), ClickEvent.Action.SUGGEST_COMMAND)
+                .build();
+        final BaseComponent slot = new ClickableBuilder("  §eSlot: §7" + kit.getSlot())
+                .setHover("")
+                .setClick("/kit slot " + kit.getName() + " ", ClickEvent.Action.SUGGEST_COMMAND)
+                .build();
+        final BaseComponent noDamageTick = new ClickableBuilder("  §eNo Damage Tick: §7" + kit.getNoDamageTicks())
+                .setHover("")
+                .setClick("/kit nodamagetick " + kit.getName() + " ", ClickEvent.Action.SUGGEST_COMMAND)
+                .build();
+        final BaseComponent icon = new ClickableBuilder("§7§eIcon§7)")
+                .setHover("")
+                .setClick("/kit icon " + kit.getName(), ClickEvent.Action.RUN_COMMAND)
+                .build();
+        final BaseComponent contents = new ClickableBuilder("§7§eContents§7)")
+                .setHover("")
+                .setClick("/kit contents " + kit.getName(), ClickEvent.Action.RUN_COMMAND)
+                .build();
+        final BaseComponent effects = new ClickableBuilder("§7§eEffects§7)")
+                .setHover("")
+                .setClick("/kit effects " + kit.getName(), ClickEvent.Action.RUN_COMMAND)
+                .build();
+        final BaseComponent save = new ClickableBuilder("§7§eSave§7)")
+                .setHover("")
+                .setClick("/kit save " + kit.getName(), ClickEvent.Action.RUN_COMMAND)
+                .build();
+
+        player.spigot().sendMessage(this.separator);
+        player.sendMessage(new TextComponent("§a§lKits §e§l" + kit.getName() + "§a§lEditor:"));
+        player.spigot().sendMessage(displayName);
+        player.spigot().sendMessage(editable);
+        player.spigot().sendMessage(slot);
+        player.spigot().sendMessage(noDamageTick);
+        player.spigot().sendMessage(icon, contents, effects);
+        player.spigot().sendMessage(save);
+        player.spigot().sendMessage(this.separator);
     }
 }

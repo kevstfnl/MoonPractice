@@ -5,4 +5,6 @@ public enum ArenaType {
     SUMO,
     BRIDGE,
     BEDWARS,
+    SPLEEF,
+    TNTRUN,
 }

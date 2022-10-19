@@ -1,7 +1,24 @@
 name: MoonPractice
 version: 0.1
 author: SevenTime
+website: htt
 main: net.moon.game.Practice
-load: STARTUP
-depend:
-  - MoonCore-Bukkit
+
+commands:
+  practice:
+    description: Main practice setup command.
+    aliases:
+      - /pr
+  arena:
+    description: Setup practice's arenas command.
+    permission: practice.setup.arena
+    aliases:
+      - /arenas
+  kit:
+    description: Setup practice's kits command.
+    permission: practice.setup.kit
+    aliases:
+      - /kits
+  lobby:
+    description: Setup practice's lobby command.
+    permission: practice.setup.lobby

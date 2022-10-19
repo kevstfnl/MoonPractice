@@ -14,12 +14,19 @@
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
-    <build>
-        <defaultGoal>clean install</defaultGoal>
-        <finalName>MoonPractice</finalName>
-    </build>
+    <repositories>
+        <repository>
+            <id>spigotmc-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>jitpack-repo</id>
+            <url>https://jitpack.io/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
+        <!-- Bukkit and private Bukkit libraries -->
         <dependency>
             <groupId>net.moon.spigot</groupId>
             <artifactId>moon-server</artifactId>
@@ -27,19 +34,50 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Databases libraries -->
         <dependency>
-            <groupId>net.celerios.core</groupId>
-            <artifactId>Bukkit</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.12.11</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>4.2.3</version>
+            <scope>compile</scope>
         </dependency>
 
+        <!-- Development tools libraries -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
+            <version>1.18.24</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <defaultGoal>clean install</defaultGoal>
+        <finalName>MoonPractice</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

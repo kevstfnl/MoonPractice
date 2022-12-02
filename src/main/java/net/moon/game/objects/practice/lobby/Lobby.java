@@ -1,8 +1,8 @@
 package net.moon.game.objects.practice.lobby;
 
 import lombok.Data;
-import net.moon.game.utils.serializer.LocationSerializer;
-import net.moon.game.utils.world.Cuboid;
+import net.moon.api.commons.serializers.LocationSerializer;
+import net.moon.api.commons.world.Cuboid;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

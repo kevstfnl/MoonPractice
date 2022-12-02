@@ -1,7 +1,6 @@
 package net.moon.game.objects.players;
 
-public class
-PlayerStats {
+public class PlayerStats {
 
     private long timePlayed;
     private int wins;

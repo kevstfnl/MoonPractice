@@ -1,5 +1,8 @@
 package net.moon.game.objects.menus;
 
+import net.moon.game.objects.menus.impl.KitEditorMenu;
+import net.moon.game.objects.menus.impl.RankedQueueMenu;
+import net.moon.game.objects.menus.impl.UnrankedQueueMenu;
 import net.moon.game.objects.players.PlayerData;
 
 import java.util.Map;
@@ -16,6 +19,12 @@ public class MenusManager {
         this.menus = new ConcurrentHashMap<>();
         this.uniqueMenus = new ConcurrentHashMap<>();
         this.playersMenus = new ConcurrentHashMap<>();
+        init();
+    }
+
+    public void init() {
+        add("unranked", new UnrankedQueueMenu());
+        add("kit-editor", new KitEditorMenu());
     }
 
     public void injectPlayerGui(final PlayerData playerData) {

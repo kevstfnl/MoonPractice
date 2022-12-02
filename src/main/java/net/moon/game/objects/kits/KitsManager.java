@@ -8,7 +8,7 @@ import org.bson.Document;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static net.moon.game.constants.PracticeLogger.debug;
+import static net.moon.game.listeners.constants.PracticeLogger.debug;
 
 public class KitsManager {
 
@@ -19,6 +19,7 @@ public class KitsManager {
         debug("Init Kit Manager...");
         this.mongoManager = instance.getMongoManager();
         this.kits = new ConcurrentHashMap<>();
+
         if (this.mongoManager.getKits() != null) {
             for (Document document : this.mongoManager.getKits().find()) {
                 this.kits.put(document.getString("name"), new Kit(document));
@@ -54,6 +55,4 @@ public class KitsManager {
     public void saveAll() {
         this.kits.values().forEach(this::save);
     }
-
-
 }

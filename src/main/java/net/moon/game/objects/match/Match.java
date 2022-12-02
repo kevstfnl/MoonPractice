@@ -2,16 +2,12 @@ package net.moon.game.objects.match;
 
 import lombok.Data;
 import net.moon.game.Practice;
-import net.moon.game.objects.arenas.Arena;
 import net.moon.game.objects.arenas.ArenasManager;
-import net.moon.game.objects.arenas.StandAloneArena;
 import net.moon.game.objects.kits.Kit;
 import net.moon.game.objects.parties.Party;
 import net.moon.game.objects.players.PlayerData;
 import net.moon.game.objects.players.PlayerState;
-import net.moon.game.tasks.MatchTask;
-import net.moon.game.utils.commons.PlayerUtils;
-import net.moon.game.utils.commons.TaskUtils;
+import net.moon.game.utils.PlayerUtils;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -27,8 +23,9 @@ public class Match {
     private final MatchTask task;
     private final MatchType type;
     private final Kit kit;
+    /*
     private final Arena arena;
-    private StandAloneArena standAloneArena;
+    private StandAloneArena standAloneArena;*/
 
     private final List<PlayerData> players, firstTeam, secondTeam, spectators, dies;
     private final Map<Integer, MatchSnapshot> snapshots;
@@ -45,11 +42,13 @@ public class Match {
         this.task = new MatchTask(this);
         this.type = type;
         this.kit = kit;
+
+        /*
         this.arena = this.arenasManager.getRandomWithType(this.kit.getArenaType());
         this.standAloneArena = this.arena.getAvailable(this.kit.containBlock());
         if (this.standAloneArena == null) {
             this.arena.generate(5);
-        }
+        }*/
 
         this.players = new ArrayList<>();
         this.firstTeam = new ArrayList<>();
@@ -57,8 +56,7 @@ public class Match {
         this.spectators = new ArrayList<>();
         this.dies = new ArrayList<>();
         this.snapshots = new ConcurrentHashMap<>();
-
-        TaskUtils.run(this.task);
+        Practice.get().getServer().getScheduler().runTaskTimer(Practice.get(), this.task, 0 ,1);
     }
 
     public void setTeams(final List<PlayerData> team1, final List<PlayerData> team2) {
@@ -118,6 +116,7 @@ public class Match {
             playerData.setState(PlayerState.MATCH);
             PlayerUtils.resetPlayer(player);
 
+            /*
             if (this.type == MatchType.FFA) {
                 final Random random = new Random();
                 player.teleport(this.standAloneArena.getCenter().add(random.nextInt() * 0.25D, 0, random.nextInt() * 0.25D));
@@ -128,6 +127,7 @@ public class Match {
                     player.teleport(this.standAloneArena.getSecondSpawn());
                 }
             }
+            */
 
             this.kit.applyKit(playerData);
         });

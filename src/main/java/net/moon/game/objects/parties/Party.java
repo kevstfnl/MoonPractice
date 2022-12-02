@@ -5,7 +5,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.moon.game.Practice;
 import net.moon.game.objects.players.PlayerData;
 import net.moon.game.objects.players.PlayerState;
-import net.moon.game.utils.commons.PlayerUtils;
+import net.moon.game.utils.PlayerUtils;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;

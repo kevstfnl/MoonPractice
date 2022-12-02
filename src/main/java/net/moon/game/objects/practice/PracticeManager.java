@@ -29,4 +29,8 @@ public class PracticeManager {
     public void stop() {
         this.mongoManager.update(this.lobby);
     }
+
+    public void run() {
+
+    }
 }

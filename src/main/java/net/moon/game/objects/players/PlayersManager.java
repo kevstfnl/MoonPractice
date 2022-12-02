@@ -1,5 +1,6 @@
 package net.moon.game.objects.players;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mongodb.client.model.Filters;
 import lombok.Getter;
 import net.moon.game.Practice;
@@ -14,20 +15,22 @@ import org.bukkit.entity.Player;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import static net.moon.game.constants.PracticeLogger.debug;
+import static net.moon.game.listeners.constants.PracticeLogger.debug;
 
 public class PlayersManager {
 
-    private final Practice instance;
     private final MongoManager mongoManager;
     private final RedisDatabase redisDatabase;
     private final MenusManager menusManager;
     @Getter private final Map<UUID, PlayerData> players;
 
+    private final ExecutorService thread;
+
     public PlayersManager(final Practice instance) {
         debug("Init Player Manger...");
-        this.instance = instance;
         this.mongoManager = instance.getMongoManager();
         
         final RedisManager redisManager = instance.getRedisManager();
@@ -37,6 +40,8 @@ public class PlayersManager {
         this.menusManager = instance.getMenusManager();
         
         this.players = new ConcurrentHashMap<>();
+
+        this.thread = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setPriority(3).setNameFormat("Data Executor").build());
 
         //Security for already online players
         Bukkit.getOnlinePlayers().forEach(this::inject);
@@ -49,24 +54,27 @@ public class PlayersManager {
     }
 
     public void inject(final Player player) {
-        this.instance.execute(() -> {
-            final UUID uuid = player.getUniqueId();
-            PlayerData playerData = getFromRedis(uuid);
+        final UUID uuid = player.getUniqueId();
+
+        this.thread.execute(() -> {
+            PlayerData playerData = this.players.get(uuid);
             if (playerData == null) {
-                playerData = getFromMongo(uuid);
+                playerData = getFromRedis(uuid);
                 if (playerData == null) {
-                    playerData = new PlayerData(player);
-                    this.save(playerData);
+                    playerData = getFromMongo(uuid);
+                    if (playerData == null) {
+                        playerData = new PlayerData(player);
+                    }
+                    this.saveToRedis(playerData);
                 }
-                this.saveToRedis(playerData);
+                this.players.put(uuid, playerData);
             }
-            this.players.put(uuid, playerData);
             this.menusManager.injectPlayerGui(playerData);
         });
     }
 
     public void uninject(final PlayerData playerData) {
-        this.instance.execute(() -> {
+        this.thread.execute(() -> {
             this.menusManager.uninjectPlayerGui(playerData.getUuid());
             playerData.setState(PlayerState.OFFLINE);
             saveToRedis(playerData);
@@ -74,7 +82,7 @@ public class PlayersManager {
     }
 
     public void delete(final PlayerData playerData)  {
-        this.instance.execute(() -> {
+        this.thread.execute(() -> {
             this.redisDatabase.del(playerData.getUuid().toString());
             this.mongoManager.reset(playerData);
         });
@@ -82,19 +90,6 @@ public class PlayersManager {
 
     public PlayerData get(final Player player) { return this.get(player.getUniqueId()); }
     public PlayerData get(final UUID uuid) { return this.players.get(uuid); }
-
-    public void save(final PlayerData playerData) {
-        saveToRedis(playerData);
-        saveToMongo(playerData);
-    }
-
-    public void saveToMongo(final PlayerData playerData) {
-        this.mongoManager.update(playerData);
-    }
-    public void saveToRedis(final PlayerData playerData) {
-        this.redisDatabase.set(playerData.getUuid().toString(), playerData.toDocument().toJson());
-    }
-
     public PlayerData getFromRedis(final UUID uuid) {
         final Document document = Document.parse(this.redisDatabase.get(uuid.toString()));
         if (document == null) return null;
@@ -104,5 +99,16 @@ public class PlayersManager {
         final Document document = this.mongoManager.getPlayers().find(Filters.eq("uuid", uuid)).limit(1).first();
         if (document == null) return null;
         return new PlayerData(document);
+    }
+
+    public void save(final PlayerData playerData) {
+        saveToRedis(playerData);
+        saveToMongo(playerData);
+    }
+    public void saveToMongo(final PlayerData playerData) {
+        this.mongoManager.update(playerData);
+    }
+    public void saveToRedis(final PlayerData playerData) {
+        this.redisDatabase.set(playerData.getUuid().toString(), playerData.toDocument().toJson());
     }
 }

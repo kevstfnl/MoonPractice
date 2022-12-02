@@ -1,7 +1,7 @@
 package net.moon.game.objects.players;
 
 import lombok.Data;
-import net.moon.game.utils.serializer.InventorySerializer;
+import net.moon.api.commons.serializers.InventorySerializer;
 import org.bson.Document;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,9 +36,9 @@ public class PlayerKit {
 
     public boolean isInventoryEmpty() {
         for (ItemStack item : this.contents) {
-            if (item != null) return false;
+            if (item != null) return true;
         }
-        return true;
+        return false;
     }
 
     public Document toDocument() {

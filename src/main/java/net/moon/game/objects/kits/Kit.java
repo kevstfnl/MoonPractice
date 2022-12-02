@@ -1,13 +1,12 @@
 package net.moon.game.objects.kits;
 
 import lombok.Data;
+import net.moon.api.commons.builders.ItemBuilder;
+import net.moon.api.commons.serializers.EffectsSerializer;
+import net.moon.api.commons.serializers.InventorySerializer;
 import net.moon.game.Practice;
-import net.moon.game.objects.arenas.ArenaType;
 import net.moon.game.objects.players.PlayerData;
-import net.moon.game.utils.builders.ItemBuilder;
-import net.moon.game.utils.commons.PlayerUtils;
-import net.moon.game.utils.commons.TaskUtils;
-import net.moon.game.utils.serializer.InventorySerializer;
+import net.moon.game.utils.PlayerUtils;
 import net.moon.spigot.Moon;
 import net.moon.spigot.configurations.KnockbackConfig;
 import net.moon.spigot.knockback.KnockbackProfile;
@@ -19,7 +18,6 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Data
 public class Kit {
@@ -28,7 +26,7 @@ public class Kit {
     private ItemStack icon;
     private int slot;
 
-    private ArenaType arenaType;
+    //private ArenaType arenaType;
 
     private ItemStack[] contents;
     private ItemStack[] armors;
@@ -48,7 +46,7 @@ public class Kit {
                 .setName(this.displayName)
                 .build();
         this.slot = 0;
-        this.arenaType = null;
+        //this.arenaType = null;
         this.contents = new ItemStack[36];
         this.armors = new ItemStack[4];
         this.effects = new ArrayList<>();
@@ -69,12 +67,12 @@ public class Kit {
                 .setAmount(1)
                 .setName(this.displayName)
                 .build();
-        this.arenaType = ArenaType.valueOf(document.getString("arenaType"));
+        //this.arenaType = ArenaType.valueOf(document.getString("arenaType"));
 
         final Document inventory = (Document) document.get("inventory");
         this.contents = InventorySerializer.deserializeInventory(inventory.getString("contents"));
         this.armors = InventorySerializer.deserializeInventory(inventory.getString("armors"));
-        this.effects = InventorySerializer.deserializeEffects(inventory.getString("effects"));
+        this.effects = EffectsSerializer.deserializeEffects(inventory.getString("effects"));
         this.noDamageTicks = inventory.getInteger("noDamageTicks");
 
         if (Practice.isUseMoon) {
@@ -88,6 +86,7 @@ public class Kit {
         this.enabled = document.getBoolean("enabled");
         this.editable = document.getBoolean("editable");
     }
+
     public void setDisplayName(final String displayName) {
         this.displayName = displayName.replaceAll("&", "§");
     }
@@ -104,39 +103,35 @@ public class Kit {
     }
 
     public void applyEffects(final Player player) {
-        TaskUtils.run(() -> {
-            if (!this.effects.isEmpty()) {
-                for (final PotionEffect effect : this.effects) {
-                    player.addPotionEffect(effect);
-                }
+        if (!this.effects.isEmpty()) {
+            for (final PotionEffect effect : this.effects) {
+                player.addPotionEffect(effect);
             }
-            player.setMaximumNoDamageTicks(this.noDamageTicks);
-        });
+        }
+        player.setMaximumNoDamageTicks(this.noDamageTicks);
     }
 
     public void applyInventoryContents(final PlayerData playerData) {
         applyInventoryContents(playerData, false);
     }
+
     public void applyInventoryContents(final PlayerData playerData, boolean update) {
         final Player player = playerData.getPlayer();
-        TaskUtils.run(() -> {
-            if (!playerData.getKits().get(this).isInventoryEmpty()) {
-                player.getInventory().setContents(playerData.getKits().get(this).getContents());
-            } else {
-                player.getInventory().setContents(this.contents);
-            }
-            if (update) player.updateInventory();
-        });
+        if (!playerData.getKits().get(this).isInventoryEmpty()) {
+            player.getInventory().setContents(playerData.getKits().get(this).getContents());
+        } else {
+            player.getInventory().setContents(this.contents);
+        }
+        if (update) player.updateInventory();
     }
 
     public void applyInventoryArmor(final Player player) {
         applyInventoryArmor(player, false);
     }
+
     public void applyInventoryArmor(final Player player, boolean update) {
-        TaskUtils.run(() -> {
-            player.getInventory().setArmorContents(this.armors);
-            if (update) player.updateInventory();
-        });
+        player.getInventory().setArmorContents(this.armors);
+        if (update) player.updateInventory();
     }
 
     public void applyKnockbackProfile(final Player player) {
@@ -163,12 +158,12 @@ public class Kit {
         toReturn.put("name", this.name);
         toReturn.put("displayName", this.displayName);
         toReturn.put("icon", this.icon.getType().name());
-        toReturn.put("arenaType", this.arenaType.name());
+        //toReturn.put("arenaType", this.arenaType.name());
 
         final Document inventory = new Document();
         inventory.put("contents", InventorySerializer.serializeInventory(this.contents));
         inventory.put("armors", InventorySerializer.serializeInventory(this.armors));
-        inventory.put("effects", InventorySerializer.serializeEffects(this.effects.stream().toList()));
+        inventory.put("effects", EffectsSerializer.serializeEffects(this.effects.stream().toList()));
         inventory.put("noDamageTicks", this.noDamageTicks);
         if (Practice.isUseMoon) {
             inventory.put("knockbackProfile", this.knockbackProfile.getName());

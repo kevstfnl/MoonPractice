@@ -3,13 +3,12 @@ package net.moon.game.commands.admins;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.moon.api.commons.builders.ClickableBuilder;
 import net.moon.game.Practice;
-import net.moon.game.constants.PracticePermissions;
+import net.moon.game.listeners.constants.PracticePermissions;
 import net.moon.game.objects.kits.Kit;
 import net.moon.game.objects.kits.KitsManager;
-import net.moon.game.utils.builders.ClickableBuilder;
 import net.moon.spigot.Moon;
-import net.moon.spigot.configurations.MoonConfig;
 import net.moon.spigot.knockback.KnockbackProfile;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -27,38 +26,13 @@ public class KitCommand implements CommandExecutor {
         this.kitsManager = instance.getKitsManager();
         this.separator = new TextComponent("§8» §8§m---------------------§8 «");
     }
+
     @Override
     public boolean onCommand(final CommandSender sender, final Command command, final String s, final String[] args) {
         if (!sender.hasPermission(PracticePermissions.setup)) return false;
         if (sender instanceof Player player) {
             switch (args.length) {
-                case 0 -> {
-                    player.spigot().sendMessage(this.separator);
-                    player.sendMessage(new TextComponent("§a§lKits Editor:"));
-                    final BaseComponent create = new ClickableBuilder("§7(§aCreate§7)")
-                            .setHover("§aClick here to create a new kit")
-                            .setClick("/kit create ", ClickEvent.Action.SUGGEST_COMMAND).build();
-                    final BaseComponent saveAll = new ClickableBuilder("§7(§eSave-All§7)")
-                            .setHover("§aClick here to save all kits.")
-                            .setClick("/kit saveall", ClickEvent.Action.RUN_COMMAND)
-                            .build();
-
-                    for (Kit kit : this.kitsManager.getKits().values()) {
-                        final BaseComponent enable = new ClickableBuilder("  §7(" + (kit.isEnabled() ? "" : "§a") + "✓§7)")
-                                .setHover(kit.isEnabled() ? "§cClick here to disable this kit." : "§aClick here to enable this kit.")
-                                .setClick("/kit enable " + kit.getName(), ClickEvent.Action.RUN_COMMAND).build();
-                        final BaseComponent kitName = new TextComponent("§e" + kit.getName());
-                        final BaseComponent delete = new ClickableBuilder("§7(§c❌§7")
-                                .setHover("§cClick here to delete this kit.")
-                                .setClick("/kit delete " + kit.getName(), ClickEvent.Action.RUN_COMMAND).build();
-                        final BaseComponent edit = new ClickableBuilder("§7(§e✎§7)")
-                                .setHover("§7Click here to edit this kit.")
-                                .setClick("/kit edit " + kit.getName(), ClickEvent.Action.RUN_COMMAND).build();
-                        player.spigot().sendMessage(enable, kitName, delete, edit);
-                    }
-                    player.spigot().sendMessage(create, saveAll);
-                    player.spigot().sendMessage(this.separator);
-                }
+                case 0 -> sendMainMessage(player);
                 case 1 -> {
                     if (args[0].equalsIgnoreCase("saveall")) {
                         this.kitsManager.saveAll();
@@ -67,7 +41,12 @@ public class KitCommand implements CommandExecutor {
                 case 2 -> {
                     switch (args[0].toLowerCase()) {
                         case "create" -> {
-                            final Kit kit = this.kitsManager.create(args[1]);
+                            Kit kit = this.kitsManager.get(args[1]);
+                            if (kit != null) {
+                                player.sendMessage("§cKit §e" + kit.getName() + " exist.");
+                                return false;
+                            }
+                            kit = this.kitsManager.create(args[1]);
                             sendEditMessage(player, kit);
                             player.sendMessage("§aKit §e" + kit.getName() + " has been created.");
                         }
@@ -82,6 +61,7 @@ public class KitCommand implements CommandExecutor {
                             final Kit kit = this.kitsManager.get(args[1]);
                             if (kit != null) {
                                 sendEditMessage(player, kit);
+                                return false;
                             }
                         }
                     }
@@ -160,6 +140,34 @@ public class KitCommand implements CommandExecutor {
         return false;
     }
 
+    private void sendMainMessage(final Player player) {
+        player.spigot().sendMessage(this.separator);
+        player.sendMessage(new TextComponent("§a§lKits Editor:"));
+        final BaseComponent create = new ClickableBuilder("§7(§aCreate§7)")
+                .setHover("§aClick here to create a new kit")
+                .setClick("/kit create ", ClickEvent.Action.SUGGEST_COMMAND).build();
+        final BaseComponent saveAll = new ClickableBuilder("§7(§eSave-All§7)")
+                .setHover("§aClick here to save all kits.")
+                .setClick("/kit saveall", ClickEvent.Action.RUN_COMMAND)
+                .build();
+
+        for (Kit kit : this.kitsManager.getKits().values()) {
+            final BaseComponent enable = new ClickableBuilder("  §7(" + (kit.isEnabled() ? "" : "§a") + "✓§7)")
+                    .setHover(kit.isEnabled() ? "§cClick here to disable this kit." : "§aClick here to enable this kit.")
+                    .setClick("/kit enable " + kit.getName(), ClickEvent.Action.RUN_COMMAND).build();
+            final BaseComponent kitName = new TextComponent("§e" + kit.getName());
+            final BaseComponent delete = new ClickableBuilder("§7(§c❌§7")
+                    .setHover("§cClick here to delete this kit.")
+                    .setClick("/kit delete " + kit.getName(), ClickEvent.Action.RUN_COMMAND).build();
+            final BaseComponent edit = new ClickableBuilder("§7(§e✎§7)")
+                    .setHover("§7Click here to edit this kit.")
+                    .setClick("/kit edit " + kit.getName(), ClickEvent.Action.RUN_COMMAND).build();
+            player.spigot().sendMessage(enable, kitName, delete, edit);
+        }
+        player.spigot().sendMessage(create, saveAll);
+        player.spigot().sendMessage(this.separator);
+    }
+
     private void sendEditMessage(final Player player, final Kit kit) {
         final BaseComponent displayName = new ClickableBuilder("  §eDisplay-Name: §7" + kit.getDisplayName())
                 .setHover("")
@@ -189,6 +197,10 @@ public class KitCommand implements CommandExecutor {
                 .setHover("")
                 .setClick("/kit effects " + kit.getName(), ClickEvent.Action.RUN_COMMAND)
                 .build();
+        final BaseComponent back = new ClickableBuilder("§7§f\uD83E\uDC80§7) ")
+                .setHover("")
+                .setClick("/kit", ClickEvent.Action.RUN_COMMAND)
+                .build();
         final BaseComponent save = new ClickableBuilder("§7§eSave§7)")
                 .setHover("")
                 .setClick("/kit save " + kit.getName(), ClickEvent.Action.RUN_COMMAND)
@@ -201,7 +213,7 @@ public class KitCommand implements CommandExecutor {
         player.spigot().sendMessage(slot);
         player.spigot().sendMessage(noDamageTick);
         player.spigot().sendMessage(icon, contents, effects);
-        player.spigot().sendMessage(save);
+        player.spigot().sendMessage(back, save);
         player.spigot().sendMessage(this.separator);
     }
 }

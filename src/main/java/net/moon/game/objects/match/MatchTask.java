@@ -1,27 +1,18 @@
-package net.moon.game.tasks;
+package net.moon.game.objects.match;
 
-import net.moon.game.objects.match.Match;
-import net.moon.game.objects.match.MatchState;
-import org.bukkit.scheduler.BukkitRunnable;
-
-public class MatchTask extends BukkitRunnable {
-
-    private final Match match;
-
-    public MatchTask(final Match match) {
-        this.match = match;
-    }
+public record MatchTask(Match match) implements Runnable {
 
     @Override
     public void run() {
         switch (this.match.getState()) {
             case CREATING -> {
+                /*
                 if (this.match.getStandAloneArena() == null) {
                     this.match.setStandAloneArena(this.match.getArena().getAvailable(this.match.getKit().containBlock()));
                 }
                 if (this.match.getStandAloneArena() != null) {
                     this.match.setState(MatchState.STARTING);
-                }
+                }*/
             }
             case STARTING -> {
                 this.match.apply();

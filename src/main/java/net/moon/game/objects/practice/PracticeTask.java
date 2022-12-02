@@ -1,17 +1,17 @@
-package net.moon.game.tasks;
+package net.moon.game.objects.practice;
 
 import net.moon.game.Practice;
-import net.moon.game.constants.PracticeLogger;
+import net.moon.game.listeners.constants.PracticeLogger;
 import net.moon.game.objects.leaderboards.LeaderboardsManager;
 import net.moon.game.objects.practice.lobby.Lobby;
 import net.moon.game.objects.players.PlayerData;
 import net.moon.game.objects.players.PlayersManager;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import static net.moon.game.constants.PracticeLogger.log;
 
-public class PracticeTask extends BukkitRunnable {
+import static net.moon.game.listeners.constants.PracticeLogger.log;
+
+public class PracticeTask implements Runnable {
 
     private final PlayersManager playersManager;
     private final LeaderboardsManager leaderboardsManager;
@@ -38,7 +38,7 @@ public class PracticeTask extends BukkitRunnable {
                 switch (playerData.getState()) {
                     case LOBBY, QUEUE -> {
                         final Player player = playerData.getPlayer();
-                        if (this.lobby.getBorder().isIn(player)) {
+                        if (!this.lobby.getBorder().isIn(player)) {
                             player.teleport(this.lobby.getSpawn());
                         }
                     }

@@ -5,8 +5,7 @@ import net.moon.game.Practice;
 import net.moon.game.objects.kits.Kit;
 import net.moon.game.objects.parties.Party;
 import net.moon.game.objects.parties.PartyState;
-import net.moon.game.utils.commons.PlayerUtils;
-import net.moon.game.utils.commons.TaskUtils;
+import net.moon.game.utils.PlayerUtils;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -68,16 +67,16 @@ public class PlayerData {
     }
 
     public void init() {
-        PlayerUtils.resetPlayer(this.player);
-        this.state = PlayerState.LOBBY;
-        applyHotbar();
+        this.instance.postToMainThread(() -> {
+            PlayerUtils.resetPlayer(this.player);
+            this.state = PlayerState.LOBBY;
+            applyHotbar();
+        });
     }
 
     public void applyHotbar() {
-        TaskUtils.run(() -> {
-            this.player.getInventory().setContents(this.instance.getPracticeManager().getHotbar().getHotbar(this));
-            this.player.updateInventory();
-        });
+        this.player.getInventory().setContents(this.instance.getPracticeManager().getHotbar().getHotbar(this));
+        this.player.updateInventory();
     }
 
     public boolean inLobby() {

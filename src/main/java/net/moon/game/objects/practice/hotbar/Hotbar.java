@@ -1,8 +1,8 @@
 package net.moon.game.objects.practice.hotbar;
 
+import net.moon.api.commons.builders.ItemBuilder;
 import net.moon.game.objects.players.PlayerData;
 import net.moon.game.objects.queues.impl.ClassicQueue;
-import net.moon.game.utils.builders.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,6 +21,9 @@ public class Hotbar {
             case LOBBY -> {
                 for (LobbyItems items : LobbyItems.values()) {
                     if (items.equals(LobbyItems.LEAVE)) continue;
+                    if (items.type.equals(Material.SKULL_ITEM)) {
+                        toReturn[items.slot] = new ItemBuilder(items.type).setAmount(1).setName(items.name).build();
+                    }
                     toReturn[items.slot] = new ItemBuilder(items.type).setAmount(1).setName(items.name).build();
                 }
             }
@@ -73,13 +76,15 @@ public class Hotbar {
     }
 
     public enum LobbyItems {
-        UNRANKED(Material.IRON_SWORD,"§8» §7§lUnranked", 0),
-        RANKED(Material.DIAMOND_SWORD,"§8» §b§lRanked", 1),
-        PARTY(Material.BLAZE_POWDER,"§8» §e§lParty", 4),
-        PROFILE(Material.SKULL_ITEM,"§8» §6§lProfile", 7),
-        SPECTATE(Material.COMPASS,"§8» §5§lSpectate", 8),
+        UNRANKED(Material.IRON_SWORD,"§8» §7§lUnranked §7§o(Right click)", 0),
+        RANKED(Material.DIAMOND_SWORD,"§8» §b§lRanked §7§o(Right click)", 1),
+        SPECTATE(Material.COMPASS,"§8» §5§lSpectate §7§o(Right click)", 3),
+        PARTY(Material.BLAZE_POWDER,"§8» §e§lParty §7§o(Right click)", 4),
+        PROFILE(Material.SKULL_ITEM,"§8» §6§lProfile §7§o(Right click)", 5),
+        SETTINGS(Material.REDSTONE_COMPARATOR, "§8» §2§lSettings §7§o(Right click)", 7),
+        KIT_EDITOR(Material.BOOK, "§8» §a§lKit Editor §7§o(Right click)", 8),
 
-        LEAVE(Material.REDSTONE,"§8» §c§lLeave", -1);
+        LEAVE(Material.REDSTONE,"§8» §c§lLeave §7§o(Right click)", -1);
 
         private final Material type;
         private final String name;
@@ -92,14 +97,14 @@ public class Hotbar {
         }
     }
     public enum PartyItems {
-        PARTY_INFO(Material.PAPER,"§8» §e§lInformation", 4),
-        PARTY_SETTINGS(Material.REDSTONE_COMPARATOR,"§8» §3§lSettings", 5),
-        UNRANKED_DUO(Material.IRON_SWORD,"§8» §7§lUnranked §8(Duo)", 1),
-        RANKED_DUO(Material.DIAMOND_SWORD,"§8» §b§lRanked §8(Duo)",2),
-        PARTY_EVENT(Material.DIAMOND,"§8» §2§lEvents", 0),
-        PROFILE(Material.SKULL_ITEM,"§8» §6§lProfile", 7),
+        PARTY_INFO(Material.PAPER,"§8» §e§lInformation §7§o(Right click)", 4),
+        PARTY_SETTINGS(Material.REDSTONE_COMPARATOR,"§8» §3§lSettings §7§o(Right click)", 5),
+        UNRANKED_DUO(Material.IRON_SWORD,"§8» §7§lUnranked §8(Duo) §7§o(Right click)", 1),
+        RANKED_DUO(Material.DIAMOND_SWORD,"§8» §b§lRanked §8(Duo) §7§o(Right click)",2),
+        PARTY_EVENT(Material.DIAMOND,"§8» §2§lEvents §7§o(Right click)", 0),
+        PROFILE(Material.SKULL_ITEM,"§8» §6§lProfile §7§o(Right click)", 7),
 
-        LEAVE(Material.REDSTONE,"§8» §c§lLeave",8);
+        LEAVE(Material.REDSTONE,"§8» §c§lLeave §7§o(Right click)",8);
 
         private final Material type;
         private final String name;
@@ -112,9 +117,9 @@ public class Hotbar {
         }
     }
     public enum SpectatorItems {
-        NAVIGATION(Material.COMPASS,"§8» §a§lNavigation", 0),
+        NAVIGATION(Material.COMPASS,"§8» §a§lNavigation §7§o(Right click)", 0),
 
-        LEAVE(Material.REDSTONE,"§8» §c§lLeave", 8);
+        LEAVE(Material.REDSTONE,"§8» §c§lLeave §7§o(Right click)", 8);
 
         private final Material type;
         private final String name;

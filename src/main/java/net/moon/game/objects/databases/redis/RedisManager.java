@@ -10,7 +10,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static net.moon.game.constants.PracticeLogger.debug;
+import static net.moon.game.listeners.constants.PracticeLogger.debug;
 
 public class RedisManager {
 

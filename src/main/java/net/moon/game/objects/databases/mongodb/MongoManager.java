@@ -22,7 +22,7 @@ import org.bson.Document;
 
 import java.util.Arrays;
 
-import static net.moon.game.constants.PracticeLogger.debug;
+import static net.moon.game.listeners.constants.PracticeLogger.debug;
 
 public class MongoManager {
 
@@ -47,7 +47,7 @@ public class MongoManager {
         final MongoClientOptions mongoClientOptions = MongoClientOptions.builder().build();
 
         if (config.isMongoAuthentication()) {
-            MongoCredential mongoCredential = MongoCredential.createCredential(
+            final MongoCredential mongoCredential = MongoCredential.createCredential(
                     config.getMongoUsername(),
                     config.getMongoDatabase(),
                     config.getMongoPassword().toCharArray());
@@ -107,8 +107,7 @@ public class MongoManager {
     }
     public void reset(final Lobby lobby) {
         final Document document = this.practice.find().first();
-        if (document == null) return;
-        document.clear();
+        if (document != null) document.clear();
     }
 
     public void update(final PlayerData playerData) {
@@ -121,8 +120,7 @@ public class MongoManager {
     }
     public void reset(final PlayerData playerData) {
         final Document document = this.players.find(Filters.eq("uuid", playerData.getUuid())).limit(1).first();
-        if (document == null) return;
-        document.clear();
+        if (document != null) document.clear();
     }
 
     public void update(final Kit kit) {
@@ -135,8 +133,7 @@ public class MongoManager {
     }
     public void reset(final Kit kit) {
         final Document document = this.kits.find(Filters.eq("name", kit.getName())).limit(1).first();
-        if (document == null) return;
-        document.clear();
+        if (document != null) document.clear();
     }
 
     public void update(final Arena arena) {
@@ -149,8 +146,7 @@ public class MongoManager {
     }
     public void reset(final Arena arena) {
         final Document document = this.arenas.find(Filters.eq("name", arena.getName())).limit(1).first();
-        if (document == null) return;
-        document.clear();
+        if (document != null) document.clear();
     }
 
     public void update(final Leaderboard leaderboard) {
@@ -163,7 +159,6 @@ public class MongoManager {
     }
     public void reset(final Leaderboard leaderboard) {
         final Document document = this.leaderboards.find(Filters.eq("name", leaderboard.getKit())).limit(1).first();
-        if (document == null) return;
-        document.clear();
+        if (document != null) document.clear();
     }
 }

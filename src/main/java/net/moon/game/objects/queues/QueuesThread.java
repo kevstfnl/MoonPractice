@@ -1,4 +1,4 @@
-package net.moon.game.tasks;
+package net.moon.game.objects.queues;
 
 import net.moon.game.objects.queues.QueueManager;
 

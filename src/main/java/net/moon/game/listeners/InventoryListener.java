@@ -20,7 +20,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 
-import static net.moon.game.constants.PracticeLogger.log;
+import static net.moon.game.listeners.constants.PracticeLogger.log;
 
 public class InventoryListener implements Listener {
 
@@ -52,19 +52,19 @@ public class InventoryListener implements Listener {
         switch (playerData.getState()) {
             case OFFLINE -> e.setCancelled(true);
             case LOBBY -> {
+                e.setCancelled(true);
                 if (e.getItem() == null || e.getItem().getType().equals(Material.AIR)) {
-                    e.setCancelled(true);
                     return;
                 }
                 final Hotbar.LobbyItems items = this.hotbar.lobbyItemsFromItemStack(e.getItem());
                 switch (items) {
                     case UNRANKED -> this.menusManager.getPlayerMenu(playerData, "unranked").open(player);
-                    case RANKED -> this.menusManager.getPlayerMenu(playerData, "ranked").open(player);
-                    case PROFILE -> this.menusManager.getPlayerMenu(playerData, "profile").open(player);
+                    case RANKED, SETTINGS, PROFILE -> player.sendMessage("§6Soon...");
                     case SPECTATE -> {
                         playerData.setState(PlayerState.SPECTATE);
                         playerData.applyHotbar();
                     }
+                    case KIT_EDITOR -> this.menusManager.getPlayerMenu(playerData, "kit-editor");
                     case PARTY -> this.partyManager.create(playerData);
                     case LEAVE -> playerData.getPlayerQueue().clear();
                 }

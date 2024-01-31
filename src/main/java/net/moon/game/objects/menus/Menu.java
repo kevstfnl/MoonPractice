@@ -21,18 +21,24 @@ public abstract class Menu implements InventoryHolder {
 
     @Setter private PlayerData playerData;
     private final boolean unique;
+    private final boolean autoUpdate;
 
     public Inventory inventory;
 
-    public Menu(final String title, final MenuSize size, final boolean unique) {
+    public Menu(final String title, final MenuSize size, final boolean unique, final boolean autoUpdate) {
         this.instance = Practice.get();
         this.title = title;
         this.size = size;
 
         this.unique = unique;
+        this.autoUpdate = autoUpdate;
 
         this.inventory = Bukkit.createInventory(this, this.size.getSize(), this.title);
+        this.inventory.clear();
+        this.updateItems();
     }
+
+    public abstract void updateItems();
 
     public void open(final Player player) {
         player.openInventory(this.inventory);

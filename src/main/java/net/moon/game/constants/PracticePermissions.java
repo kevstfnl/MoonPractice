@@ -1,4 +1,4 @@
-package net.moon.game.listeners.constants;
+package net.moon.game.constants;
 
 public class PracticePermissions {
 

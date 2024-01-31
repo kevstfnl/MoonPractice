@@ -14,15 +14,12 @@ public abstract class Queue {
     private final Practice instance;
     private final QueueType type;
     private final Kit kit;
-
     public ConcurrentLinkedDeque<Object> queue;
 
     public Queue(final QueueType type, final Kit kit) {
         this.instance = Practice.get();
-
         this.type = type;
         this.kit = kit;
-
         this.queue = new ConcurrentLinkedDeque<>();
     }
 

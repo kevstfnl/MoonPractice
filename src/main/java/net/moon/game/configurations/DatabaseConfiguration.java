@@ -1,10 +1,9 @@
 package net.moon.game.configurations;
 
 import lombok.Getter;
-import net.moon.core.commons.yaml.YAMLConfiguration;
+import net.eno.utils.builders.YAMLBuilder;
 
 import java.io.File;
-import java.util.Collections;
 
 @Getter
 public class DatabaseConfiguration {
@@ -20,10 +19,9 @@ public class DatabaseConfiguration {
 
     public DatabaseConfiguration(final File path) {
         final File file = new File(path, "database.yml");
-        final YAMLConfiguration config = new YAMLConfiguration(file, "");
+        final YAMLBuilder config = new YAMLBuilder(file, "");
 
         //Mongo
-        config.setComment("databases.mongo", Collections.singletonList("Mongo Database configuration section:"));
         this.mongoName = config.getString("databases.mongo.name", "MoonPractice");
         this.mongoHost = config.getString("databases.mongo.host", "127.0.0.1");
         this.mongoPort = config.getInt("databases.mongo.port", 27017);
@@ -33,7 +31,6 @@ public class DatabaseConfiguration {
         this.mongoDatabase = config.getString("databases.mongo.authentication.database", "admin");
 
         //Redis
-        config.setComment("databases.redis", Collections.singletonList("Redis Database configuration section:"));
         this.redisHost = config.getString("databases.redis.host", "127.0.0.1");
         this.redisPort = config.getInt("databases.redis.port", 6379);
         this.redisTimeout = config.getInt("databases.redis.timeout", 3000);

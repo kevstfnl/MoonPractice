@@ -1,6 +1,6 @@
 package net.moon.game.objects.menus.impl;
 
-import net.moon.api.commons.builders.ItemBuilder;
+import net.eno.utils.builders.ItemBuilder;
 import net.moon.game.objects.kits.Kit;
 import net.moon.game.objects.kits.KitsManager;
 import net.moon.game.objects.menus.Menu;
@@ -15,9 +15,8 @@ import java.util.Arrays;
 public class KitEditorMenu extends Menu {
 
     public KitEditorMenu() {
-        super("§a§lKit Editor", MenuSize.NORMAL, false);
+        super("§a§lKit Editor", MenuSize.NORMAL, false, false);
 
-        inventory.clear();
         for (int n = 0; n < inventory.getSize(); n++) {
             inventory.setItem(n, new ItemBuilder(Material.STAINED_GLASS_PANE)
                     .setName(" ")
@@ -25,9 +24,9 @@ public class KitEditorMenu extends Menu {
                     .setDamage((short) 7)
                     .build());
         }
-        updateItems();
     }
 
+    @Override
     public void updateItems() {
         final KitsManager kitsManager = instance.getKitsManager();
         for (Kit kit : kitsManager.getKits().values()) {

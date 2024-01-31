@@ -1,6 +1,6 @@
 package net.moon.game.objects.practice.hotbar;
 
-import net.moon.api.commons.builders.ItemBuilder;
+import net.eno.utils.builders.ItemBuilder;
 import net.moon.game.objects.players.PlayerData;
 import net.moon.game.objects.queues.impl.ClassicQueue;
 import org.bukkit.Material;

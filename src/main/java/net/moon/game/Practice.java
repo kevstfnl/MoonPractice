@@ -7,6 +7,8 @@ import net.moon.game.commands.admins.PracticeCommand;
 import net.moon.game.configurations.DatabaseConfiguration;
 import net.moon.game.listeners.ConnexionListener;
 import net.moon.game.listeners.InventoryListener;
+import net.moon.game.listeners.MatchListener;
+import net.moon.game.objects.arenas.ArenasManager;
 import net.moon.game.objects.databases.mongodb.MongoManager;
 import net.moon.game.objects.databases.redis.RedisManager;
 import net.moon.game.objects.kits.KitsManager;
@@ -23,7 +25,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import static net.moon.game.listeners.constants.PracticeLogger.log;
+import static net.moon.game.constants.PracticeLogger.log;
 
 public class Practice extends JavaPlugin {
 
@@ -43,7 +45,7 @@ public class Practice extends JavaPlugin {
     @Getter private MongoManager mongoManager; //MongoDB manager, used to save data into database.
     @Getter private PlayersManager playersManager; //Players manager, used to control all player's data.
     @Getter private KitsManager kitsManager; //Kits manager, used to control all kit's data.
-   // @Getter private ArenasManager arenasManager; //Arenas manager, used to control all arena's data.
+    @Getter private ArenasManager arenasManager; //Arenas manager, used to control all arena's data.
     @Getter private PartyManager partyManager; //Party manager, used to control all parties.
     @Getter private QueueManager queueManager; //Queues manager, used to control all queues
     @Getter private MenusManager menusManager; //Menus manager, used to create inventory gui.
@@ -80,7 +82,7 @@ public class Practice extends JavaPlugin {
         this.leaderboardsManager.stop(); //Stop leaderboard manager.
         this.queueManager.stop(); //Stop queues manager.
         this.partyManager.stop(); //Stop party manager.
-       // this.arenasManager.stop(); //Stop arena manager
+        this.arenasManager.stop(); //Stop arena manager
         this.kitsManager.stop(); //Stop kits manager.
         this.playersManager.stop(); //Stop player manager.
         this.practiceManager.stop(); //Stop practice manager.
@@ -98,7 +100,7 @@ public class Practice extends JavaPlugin {
         log("Register managers...");
         this.redisManager = new RedisManager(this); //Init Redis.
         this.mongoManager = new MongoManager(this); //Init MongoDB.
-        //this.arenasManager = new ArenasManager(this); //Init arenas manager
+        this.arenasManager = new ArenasManager(this); //Init arenas manager
         this.kitsManager = new KitsManager(this); //Init kits manager.
         this.partyManager = new PartyManager(this); //Init party manager.
         this.queueManager = new QueueManager(this); //Int queue manager.
@@ -113,6 +115,7 @@ public class Practice extends JavaPlugin {
         final PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new ConnexionListener(this), this); //Register join and quit listeners.
         pm.registerEvents(new InventoryListener(this), this); //Register inventory listeners.
+        pm.registerEvents(new MatchListener(this), this); //Register match listeners.
     }
 
     private void registerCommands() {
@@ -129,7 +132,7 @@ public class Practice extends JavaPlugin {
         scheduler.runTaskTimerAsynchronously(this, new PracticeTask(this), 1, 1); //Init main practice task
     }
 
-    public void postToMainThread(final Runnable runnable) {
+    public void runSync(final Runnable runnable) {
         this.getServer().getScheduler().runTask(this, runnable);
     }
 }

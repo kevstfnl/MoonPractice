@@ -20,7 +20,9 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 
-import static net.moon.game.listeners.constants.PracticeLogger.log;
+import java.util.UUID;
+
+import static net.moon.game.constants.PracticeLogger.log;
 
 public class InventoryListener implements Listener {
 
@@ -39,36 +41,42 @@ public class InventoryListener implements Listener {
     @EventHandler
     private void onInteract(final PlayerInteractEvent e) {
         final Player player = e.getPlayer();
-        if (player.isOp() && player.getGameMode().equals(GameMode.CREATIVE)) return;
+
         final PlayerData playerData = this.playersManager.get(player);
         if (playerData == null) {
             e.setCancelled(true);
             return;
         }
+        if (player.isOp() && player.getGameMode().equals(GameMode.CREATIVE) && playerData.inLobby()) return;
         if (e.getAction().equals(Action.PHYSICAL)) {
             e.setCancelled(!playerData.inPvp());
             return;
         }
+
         switch (playerData.getState()) {
             case OFFLINE -> e.setCancelled(true);
             case LOBBY -> {
                 e.setCancelled(true);
-                if (e.getItem() == null || e.getItem().getType().equals(Material.AIR)) {
-                    return;
-                }
+                if (e.getItem() == null || e.getItem().getType().equals(Material.AIR)) return;
                 final Hotbar.LobbyItems items = this.hotbar.lobbyItemsFromItemStack(e.getItem());
+                final UUID uuid = player.getUniqueId();
                 switch (items) {
-                    case UNRANKED -> this.menusManager.getPlayerMenu(playerData, "unranked").open(player);
-                    case RANKED, SETTINGS, PROFILE -> player.sendMessage("§6Soon...");
+                    case UNRANKED -> this.menusManager.getPlayerMenu(uuid, "unranked").open(player);
+                    case RANKED -> this.menusManager.getPlayerMenu(uuid, "ranked").open(player);
+                    case SETTINGS, PROFILE -> player.sendMessage("§6Soon...");
                     case SPECTATE -> {
                         playerData.setState(PlayerState.SPECTATE);
                         playerData.applyHotbar();
                     }
-                    case KIT_EDITOR -> this.menusManager.getPlayerMenu(playerData, "kit-editor");
+                    case KIT_EDITOR -> this.menusManager.getPlayerMenu(uuid, "kit-editor");
                     case PARTY -> this.partyManager.create(playerData);
                     case LEAVE -> playerData.getPlayerQueue().clear();
                 }
             }
+            case PARTY -> {}
+            case MATCH -> { return; }
+            case QUEUE -> {}
+            case SPECTATE -> {}
         }
     }
 

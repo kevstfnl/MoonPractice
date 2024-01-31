@@ -1,15 +1,15 @@
 package net.moon.game.objects.kits;
 
 import lombok.Data;
-import net.moon.api.commons.builders.ItemBuilder;
-import net.moon.api.commons.serializers.EffectsSerializer;
-import net.moon.api.commons.serializers.InventorySerializer;
+import net.eno.Eno;
+import net.eno.configurations.CombatConfig;
+import net.eno.knockback.KnockbackProfile;
+import net.eno.utils.builders.ItemBuilder;
+import net.eno.utils.serializers.EffectsSerializer;
+import net.eno.utils.serializers.InventorySerializer;
 import net.moon.game.Practice;
 import net.moon.game.objects.players.PlayerData;
 import net.moon.game.utils.PlayerUtils;
-import net.moon.spigot.Moon;
-import net.moon.spigot.configurations.KnockbackConfig;
-import net.moon.spigot.knockback.KnockbackProfile;
 import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -53,7 +53,7 @@ public class Kit {
         this.noDamageTicks = 20;
 
         if (Practice.isUseMoon) {
-            this.knockbackProfile = Moon.get().getKnockbackConfig().getCurrentKb();
+            this.knockbackProfile = Eno.get().getCombatConfig().getCurrentKb();
         }
 
         this.enabled = false;
@@ -69,14 +69,14 @@ public class Kit {
                 .build();
         //this.arenaType = ArenaType.valueOf(document.getString("arenaType"));
 
-        final Document inventory = (Document) document.get("inventory");
+        final Document inventory = document.get("inventory", Document.class);
         this.contents = InventorySerializer.deserializeInventory(inventory.getString("contents"));
         this.armors = InventorySerializer.deserializeInventory(inventory.getString("armors"));
         this.effects = EffectsSerializer.deserializeEffects(inventory.getString("effects"));
         this.noDamageTicks = inventory.getInteger("noDamageTicks");
 
         if (Practice.isUseMoon) {
-            final KnockbackConfig config = Moon.get().getKnockbackConfig();
+            final CombatConfig config = Eno.get().getCombatConfig();
             this.knockbackProfile = config.getKbProfileByName(document.getString("knockbackProfile"));
             if (this.knockbackProfile == null) {
                 this.knockbackProfile = config.getCurrentKb();
@@ -136,7 +136,7 @@ public class Kit {
 
     public void applyKnockbackProfile(final Player player) {
         if (Practice.isUseMoon) {
-            final KnockbackConfig config = Moon.get().getKnockbackConfig();
+            final CombatConfig config = Eno.get().getCombatConfig();
             if (config.getKbProfileByName(this.knockbackProfile.getName()) == null) {
                 this.knockbackProfile = config.getCurrentKb();
             }

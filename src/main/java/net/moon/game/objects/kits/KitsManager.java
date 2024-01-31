@@ -8,7 +8,7 @@ import org.bson.Document;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static net.moon.game.listeners.constants.PracticeLogger.debug;
+import static net.moon.game.constants.PracticeLogger.debug;
 
 public class KitsManager {
 

@@ -11,7 +11,6 @@ public class PlayerQueue {
 
     private final PlayerData playerData;
     @Getter private final Map<ClassicQueue, Long> currentQueues;
-
     
     public PlayerQueue(final PlayerData playerData) {
         this.playerData = playerData;
@@ -21,7 +20,6 @@ public class PlayerQueue {
     public void clear() {
         this.currentQueues.keySet().forEach(this::remove);
     }
-
 
     public void add(final Queue queue) {
         if (queue instanceof ClassicQueue classicQueue) {
@@ -33,6 +31,7 @@ public class PlayerQueue {
             }
         }
     }
+
     public void remove(final Queue queue) {
         if (queue instanceof ClassicQueue classicQueue) {
             this.currentQueues.remove(classicQueue);
@@ -42,6 +41,5 @@ public class PlayerQueue {
                 this.playerData.applyHotbar();
             }
         }
-
     }
 }

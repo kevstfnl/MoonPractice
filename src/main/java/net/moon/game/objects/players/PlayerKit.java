@@ -1,7 +1,7 @@
 package net.moon.game.objects.players;
 
 import lombok.Data;
-import net.moon.api.commons.serializers.InventorySerializer;
+import net.eno.utils.serializers.InventorySerializer;
 import org.bson.Document;
 import org.bukkit.inventory.ItemStack;
 

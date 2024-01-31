@@ -1,6 +1,7 @@
 package net.moon.game.objects.match;
 
 import lombok.Data;
+import lombok.Getter;
 import net.moon.game.objects.players.PlayerData;
 import org.bson.Document;
 import org.bukkit.entity.Player;
@@ -11,8 +12,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
-@Data
-public class MatchSnapshot {
+@Getter
+public class MatchStats {
 
     private final String playerName;
     private final UUID uuid;
@@ -33,7 +34,12 @@ public class MatchSnapshot {
     private double health;
     private int hunger;
 
-    public MatchSnapshot(final PlayerData playerData) {
+    private int potionsThrown;
+    private int potionsReceived;
+    private double potionsAccuracy = 8.0;
+    private double lifeWasted = 0.0;
+
+    public MatchStats(final PlayerData playerData) {
         this.playerName = playerData.getPlayer().getName();
         this.uuid = playerData.getUuid();
 
@@ -54,7 +60,7 @@ public class MatchSnapshot {
         this.hunger = 20;
     }
 
-    public MatchSnapshot(final Document document) {
+    public MatchStats(final Document document) {
         this.uuid = UUID.fromString(document.getString("uuid"));
         this.playerName = document.getString("name");
     }
@@ -82,9 +88,15 @@ public class MatchSnapshot {
         }
     }
 
+    public void addPotionsAccuracy(double heal) { this.potionsAccuracy += heal; }
+    public void addPotionsThrown() { this.potionsThrown++; }
+    public void addPotionsReceived() { this.potionsReceived++; }
+    public void addWastedLife(double life) { if (life > 0) this.lifeWasted += life; }
+    public double getPotionsAccuracy() { return (this.potionsAccuracy  / 8.0 * 100.0) / (this.potionsThrown + 1); }
+
     public void finish(final Player player) {
-        this.armor = player.getInventory().getArmorContents();
-        this.contents = player.getInventory().getContents();
+        this.armor = player.getInventory().getArmorContents().clone();
+        this.contents = player.getInventory().getContents().clone();
         this.effects = player.getActivePotionEffects();
         this.health = player.getHealth();
         this.hunger = player.getFoodLevel();

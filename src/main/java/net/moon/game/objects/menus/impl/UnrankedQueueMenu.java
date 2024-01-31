@@ -1,6 +1,6 @@
 package net.moon.game.objects.menus.impl;
 
-import net.moon.api.commons.builders.ItemBuilder;
+import net.eno.utils.builders.ItemBuilder;
 import net.moon.game.objects.kits.Kit;
 import net.moon.game.objects.menus.Menu;
 import net.moon.game.objects.menus.MenuSize;
@@ -24,20 +24,19 @@ import java.util.List;
 public class UnrankedQueueMenu extends Menu {
 
     public UnrankedQueueMenu() {
-        super("§a§lUnranked", MenuSize.NORMAL, true);
-        inventory.clear();
+        super("§a§lUnranked", MenuSize.NORMAL, true, true);
         for (int n = 0; n < inventory.getSize(); n++) {
-            inventory.setItem(n, new ItemBuilder(Material.STAINED_GLASS_PANE)
+            this.inventory.setItem(n, new ItemBuilder(Material.STAINED_GLASS_PANE)
                     .setName(" ")
                     .setAmount(1)
                     .setDamage((short) 7)
                     .build());
-            updateItems();
         }
     }
 
+    @Override
     public void updateItems() {
-        final QueueManager queueManager = instance.getQueueManager();
+        final QueueManager queueManager = this.instance.getQueueManager();
         final List<Queue> queues =  queueManager.getByType(QueueType.CLASSIC_UNRANKED);
         if (queues != null && !queues.isEmpty()) {
             for (Queue object : queues) {
@@ -46,7 +45,7 @@ public class UnrankedQueueMenu extends Menu {
                     final PlayerKit playerKit = getPlayerData().getKits().get(kit);
 
                     if (getPlayerData().getPlayerQueue().getCurrentQueues().containsKey(queue)) {
-                        inventory.setItem(kit.getSlot(), new ItemBuilder(kit.getIcon().getType())
+                        this.inventory.setItem(kit.getSlot(), new ItemBuilder(kit.getIcon().getType())
                                 .setDamage(kit.getIcon().getTypeId())
                                 .setAmount(Math.max(1, queue.getQueue().size()))
                                 .addFlag(ItemFlag.HIDE_ENCHANTS)
@@ -69,7 +68,7 @@ public class UnrankedQueueMenu extends Menu {
                                 .build()
                         );
                     } else {
-                        inventory.setItem(kit.getSlot(), new ItemBuilder(Material.REDSTONE)
+                        this.inventory.setItem(kit.getSlot(), new ItemBuilder(Material.REDSTONE)
                                 .setAmount(1)
                                 .addFlag(ItemFlag.HIDE_ENCHANTS)
                                 .addFlag(ItemFlag.HIDE_ATTRIBUTES)
@@ -105,7 +104,7 @@ public class UnrankedQueueMenu extends Menu {
                 final ItemStack currentItem = e.getCurrentItem();
                 e.setCancelled(true);
                 if (currentItem != null) {
-                    final QueueManager queueManager = instance.getQueueManager();
+                    final QueueManager queueManager = this.instance.getQueueManager();
                     final List<Queue> queues = queueManager.getByType(QueueType.CLASSIC_UNRANKED);
                     if (currentItem.getType().equals(Material.REDSTONE)) {
                         for (Queue queue : queues) {

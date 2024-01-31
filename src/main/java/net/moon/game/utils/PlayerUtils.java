@@ -62,6 +62,7 @@ public class PlayerUtils {
         player.setGameMode(GameMode.SURVIVAL);
     }
 
+
     public static void sendPacket(final Player player, final Packet<?> packet) {
         final List<Player> viewers = getTrackedPlayers(player);
         sendPacket(viewers, packet);

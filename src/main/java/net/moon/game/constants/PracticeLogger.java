@@ -1,4 +1,4 @@
-package net.moon.game.listeners.constants;
+package net.moon.game.constants;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

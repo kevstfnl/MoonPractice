@@ -1,7 +1,7 @@
 package net.moon.game.objects.practice;
 
 import net.moon.game.Practice;
-import net.moon.game.listeners.constants.PracticeLogger;
+import net.moon.game.constants.PracticeLogger;
 import net.moon.game.objects.leaderboards.LeaderboardsManager;
 import net.moon.game.objects.practice.lobby.Lobby;
 import net.moon.game.objects.players.PlayerData;
@@ -9,7 +9,7 @@ import net.moon.game.objects.players.PlayersManager;
 import org.bukkit.entity.Player;
 
 
-import static net.moon.game.listeners.constants.PracticeLogger.log;
+import static net.moon.game.constants.PracticeLogger.log;
 
 public class PracticeTask implements Runnable {
 

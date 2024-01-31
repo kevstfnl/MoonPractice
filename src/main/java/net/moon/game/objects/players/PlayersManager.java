@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static net.moon.game.listeners.constants.PracticeLogger.debug;
+import static net.moon.game.constants.PracticeLogger.debug;
 
 public class PlayersManager {
 

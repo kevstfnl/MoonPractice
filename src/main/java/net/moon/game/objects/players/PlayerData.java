@@ -3,6 +3,7 @@ package net.moon.game.objects.players;
 import lombok.Data;
 import net.moon.game.Practice;
 import net.moon.game.objects.kits.Kit;
+import net.moon.game.objects.match.MatchState;
 import net.moon.game.objects.parties.Party;
 import net.moon.game.objects.parties.PartyState;
 import net.moon.game.utils.PlayerUtils;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @Data
 public class PlayerData {
 
-    private final Practice instance; //Main practice instance.
+    protected final Practice instance; //Main practice instance.
 
     /*
     Basic datas
@@ -25,13 +26,13 @@ public class PlayerData {
     private final Player player;
     private PlayerState state;
 
-
     private LinkedHashMap<Kit, PlayerKit> kits;
 
-
+    private final PlayerSettings settings;
     private final PlayerRequests requests;
     private Party party;
     private final PlayerQueue playerQueue;
+    private final PlayerMatch playerMatch;
 
 
     public PlayerData(final Player player) {
@@ -43,8 +44,10 @@ public class PlayerData {
         for (Kit kit : this.instance.getKitsManager().getKits().values()) {
             this.kits.put(kit, new PlayerKit());
         }
+        this.settings = new PlayerSettings();
         this.requests = new PlayerRequests(this);
         this.playerQueue = new PlayerQueue(this);
+        this.playerMatch = new PlayerMatch(this);
 
         this.init();
     }
@@ -54,20 +57,22 @@ public class PlayerData {
         this.uuid = UUID.fromString(document.getString("uuid"));
         this.player = Bukkit.getPlayer(this.uuid);
 
-        final Document kits = (Document) document.get("kits");
+        final Document kits = document.get("kits", Document.class);
         if (kits != null) {
             for (String key : kits.keySet()) {
                 this.kits.put(this.instance.getKitsManager().get(key), new PlayerKit((Document) kits.get(key)));
             }
         }
+        this.settings = new PlayerSettings(document.get("settings", Document.class));
         this.requests = new PlayerRequests(this);
         this.playerQueue = new PlayerQueue(this);
+        this.playerMatch = new PlayerMatch(this);
 
         this.init();
     }
 
     public void init() {
-        this.instance.postToMainThread(() -> {
+        this.instance.runSync(() -> {
             PlayerUtils.resetPlayer(this.player);
             this.state = PlayerState.LOBBY;
             applyHotbar();
@@ -95,14 +100,17 @@ public class PlayerData {
         return this.state.equals(PlayerState.PARTY);
     }
     public boolean inPvp() {
-        return this.state.equals(PlayerState.MATCH) /*&& this.match.getState.equal(MatchState.INPROGRESS)*/
-                || this.state.equals(PlayerState.PARTY) && this.party.getState().equals(PartyState.FIGHTING);
+        return this.state.equals(PlayerState.MATCH) &&
+                this.playerMatch.getMatch().getState().equals(MatchState.INPROGRESS) &&
+                !this.playerMatch.getMatch().getDies().contains(this) ||
+                this.state.equals(PlayerState.PARTY) &&
+                this.party.getState().equals(PartyState.FIGHTING) /*&& !this.party.getMatch().contains(this)*/;
     }
 
     public Document toDocument() {
         final Document toReturn = new Document();
         toReturn.put("uuid", this.uuid.toString());
-
+        toReturn.put("settings", this.settings.toDocument());
         final Document kits = new Document();
         for (Kit kit : this.instance.getKitsManager().getKits().values()) {
             PlayerKit pk = this.kits.get(kit);

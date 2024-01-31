@@ -23,7 +23,7 @@ public class Leaderboard {
     public Leaderboard(final Document document) {
         this.kit = document.getString("kit");
         this.leaderboard = new LinkedHashMap<>();
-        for (Map.Entry<String, Object> entry : ((Document)document.get("leaderboard")).entrySet()) {
+        for (Map.Entry<String, Object> entry : (document.get("leaderboard", Document.class)).entrySet()) {
             this.leaderboard.put(entry.getKey(), (Integer) entry.getValue());
         }
     }
@@ -39,13 +39,15 @@ public class Leaderboard {
         this.leaderboard = this.leaderboard.entrySet().stream()
                 .limit(10)
                 .sorted(Map.Entry.comparingByKey())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+                .collect(
+                        Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
     }
 
     public List<String> getFormattedLeaderboard() {
         final List<String> lines = new ArrayList<>();
         lines.add("§6§l" + this.kit + "'s Leaderboards");
-        lines.add("§8§m-=-----------------=-");
+        lines.add("§8» §8§m---------------------§8 «");
         int number = 1;
         for (Map.Entry<String, Integer> entry : this.leaderboard.entrySet()) {
             final String playerName = entry.getKey() == null || entry.getKey().isEmpty() ? "Another" : entry.getKey();
@@ -53,7 +55,7 @@ public class Leaderboard {
             lines.add("§f§l" + number + "§7»" + playerName + "§7(" + playerElo + "§7");
             number++;
         }
-        lines.add("§8§m-=-----------------=-");
+        lines.add("§8» §8§m---------------------§8 «");
         return lines;
     }
 

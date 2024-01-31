@@ -1,15 +1,15 @@
 package net.moon.game.commands.admins;
 
+import net.eno.Eno;
+import net.eno.knockback.KnockbackProfile;
+import net.eno.utils.builders.ClickableBuilder;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.moon.api.commons.builders.ClickableBuilder;
 import net.moon.game.Practice;
-import net.moon.game.listeners.constants.PracticePermissions;
+import net.moon.game.constants.PracticePermissions;
 import net.moon.game.objects.kits.Kit;
 import net.moon.game.objects.kits.KitsManager;
-import net.moon.spigot.Moon;
-import net.moon.spigot.knockback.KnockbackProfile;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -31,6 +31,7 @@ public class KitCommand implements CommandExecutor {
     public boolean onCommand(final CommandSender sender, final Command command, final String s, final String[] args) {
         if (!sender.hasPermission(PracticePermissions.setup)) return false;
         if (sender instanceof Player player) {
+
             switch (args.length) {
                 case 0 -> sendMainMessage(player);
                 case 1 -> {
@@ -121,7 +122,7 @@ public class KitCommand implements CommandExecutor {
                             }
                             case "knockback" -> {
                                 if (Practice.isUseMoon) {
-                                    final KnockbackProfile profile = Moon.get().getKnockbackConfig().getKbProfileByName(args[2]);
+                                    final KnockbackProfile profile = Eno.get().getCombatConfig().getKbProfileByName(args[2]);
                                     if (profile != null) {
                                         kit.setKnockbackProfile(profile);
                                         sendEditMessage(player, kit);

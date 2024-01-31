@@ -22,7 +22,7 @@ import org.bson.Document;
 
 import java.util.Arrays;
 
-import static net.moon.game.listeners.constants.PracticeLogger.debug;
+import static net.moon.game.constants.PracticeLogger.debug;
 
 public class MongoManager {
 
@@ -65,8 +65,8 @@ public class MongoManager {
 
         this.practice = this.getCollection("practice");
         this.players = this.getCollection("players", "uuid", "name");
-        this.kits = this.getCollection("kits", "name", "display-name");
-        this.arenas = this.getCollection("arenas", "name", "display-name");
+        this.kits = this.getCollection("kits", "name", "displayName");
+        this.arenas = this.getCollection("arenas", "name", "displayName", "id");
         this.leaderboards = this.getCollection("kit");
     }
 

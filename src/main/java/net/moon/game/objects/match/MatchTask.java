@@ -6,18 +6,18 @@ public record MatchTask(Match match) implements Runnable {
     public void run() {
         switch (this.match.getState()) {
             case CREATING -> {
-                /*
-                if (this.match.getStandAloneArena() == null) {
-                    this.match.setStandAloneArena(this.match.getArena().getAvailable(this.match.getKit().containBlock()));
+                if (this.match.getStandaloneArena() == null) {
+                    this.match.getArenasManager().getAvailableArena(this.match.getKit());
                 }
-                if (this.match.getStandAloneArena() != null) {
+                if (this.match.getStandaloneArena() != null && this.match.isReady()) {
                     this.match.setState(MatchState.STARTING);
-                }*/
+                    this.match.apply();
+                }
             }
             case STARTING -> {
-                this.match.apply();
                 if (System.currentTimeMillis() - this.match.getPending() <= 3000) {
                     this.match.setState(MatchState.INPROGRESS);
+                    this.match.sendMessage("§aStarting match !");
                 }
             }
             case INPROGRESS -> {
